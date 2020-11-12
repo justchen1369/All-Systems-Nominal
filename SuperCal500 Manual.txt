@@ -1,0 +1,133 @@
+Glossary:
+Value: A variable or definite integer number, can be either an integer or address
+Address: A variable which is stored in the computer, must be a string value
+
+#### Functions ####
+
+- PRINT -
+usage: print <value> ..
+Logs the value(s) to the debug console, as characters
+
+- PRINTLN -
+usage: print <value> ..
+Logs the value(s) to the debug console, as characters, then appends a newline.
+
+- PRINTI - 
+usage: print <value>
+Logs the value to the debug console, in it's numeric form.
+
+- SET -
+usage: set <address> <value>
+Sets the variable at address to value
+
+- ADD -
+usage: add <address> <value>
+Increments the variable at address by value
+
+- SUB -
+usage: sub <address> <value>
+Decrements the variable at address by value
+
+- JUMP -
+usage: jump <value>
+Sets the program's pointer to value
+
+- TAG -
+usage: tag <address>
+Sets the variable at address to the program's pointer value. Useful in conjunction with jump statements.
+
+- IF -
+usage: if <value> <equals|notequals|greaterthan|lessthan> <value>
+Compares two values. If the values are the same, the program continues as normal. If the values are not the same, the next instruction will be skipped. Use in conjunction with jump statements to control large blocks of code.
+
+- PERIPH -
+usage: periph <address> <peripheral index> <attribute index>
+Links a peripheral to the target variable. If the attribute changes, it will be reflected by the variable, and if the variable changes, this will be reflected by the attribute. The peripheral index will be the pin number of the attached peripheral (the order which the peripheral was attached, i.e. a thruster attached first will have an index of 0, or a decoupler attached third will have an index of 2). The attribute index will be the number corresponding to the attribute being interfaced, listed in peripherals.
+
+- DELAY -
+usage: delay <value>
+Suspends the program for the value amount of clock cycles. During suspension, the computer will not use any power as no instructions are being performed.
+
+- CLEAR -
+usage: clear
+Clears the console.
+
+- QUOTES -
+Placing values in between quotation marks (") will convert the string to a list of it's character values. Handy for PRINT functions.
+
+#### Peripherals ####
+
+Peripherals are parts which can be bound to a computer, and can be interfaced via SuperCal500 code. This lists all the peripheral attributes that can currently be interfaced, and their appropriate index.
+
+- THRUSTERS -
+
+0: Gimbal (0 - 64)
+1: Sparker
+2: Fuel (0 - 64)
+3: Temperature
+
+- DECOUPLERS -
+
+0: Decouple
+
+- GYROS -
+0: Angle (0 - 360) (RELATIVE TO GLOBAL SPACE)
+
+- TAMADE -
+0: Temperature
+
+- RAM -
+0 - 7: Value
+
+#### Examples ####
+
+- SIMPLE LAUNCH PROGRAM -
+A simple program that controls a thruster for a straight ascent. Bind peripheral 0 to a thruster.
+
+periph gimbal 0 0;
+periph sparker 0 1;
+periph fuel 0 2;
+periph temp 0 3;
+set gimbal 32;
+tag start; 
+if temp lessthan 150;
+set sparker 1; 
+if temp greaterthan 150;
+set sparker 0; 
+if temp greaterthan 150;
+set fuel 96; 
+if temp greaterthan 750;
+set fuel 0; 
+jump start;
+
+- SANITY CHECK -
+A simple accumulator-counter program to for trouble shooting, and to test whether your computer is functional.
+
+set acc 0;
+tag start;
+add acc 1;
+printi acc;
+println;
+jump start;
+
+- SELF STABILISING ROCKET -
+A slight upgrade to the simple rocket program. The second peripheral should be connected to a gyro *pointing downwards*.
+
+periph gimbal 0 0;
+periph sparker 0 1;
+periph fuel 0 2;
+periph temp 0 3;
+periph gyro 1 0;
+tag start; 
+set gyrooffset gyro;
+sub gyrooffset 148;
+set gimbal gyrooffset;
+if temp lessthan 150;
+set sparker 1; 
+if temp greaterthan 150;
+set sparker 0; 
+if temp greaterthan 150;
+set fuel 96; 
+if temp greaterthan 750;
+set fuel 0; 
+jump start;
